@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
+using static UnityEngine.Rendering.DebugUI;
 
 public class Signaling : MonoBehaviour
 {
@@ -68,30 +69,28 @@ public class Signaling : MonoBehaviour
             _signaling.Play();
         }
 
-        ChangeVolume();        
+        ChangeVolume();
     }
 
     private void ChangeVolume()
     {
-        if (_isWork && _signaling.volume < 1)
-            _signaling.volume += 0.1f * Time.deltaTime;
+        float maxVolume = 1;
+        float correctionValue = 0.1f;
+        float soundCorrection = correctionValue * Time.deltaTime; ;
+
+        if (_isWork && _signaling.volume < maxVolume)
+            _signaling.volume += soundCorrection;
         else if (_isWork == false && _signaling.volume > 0)
-            _signaling.volume -= 0.1f * Time.deltaTime;
-        else if (_isWork == false && _signaling.volume <= 0)
+            _signaling.volume -= soundCorrection;
+        else
             _signaling.enabled = false;
     }
 
     private void PlayLight()
     {
-        if (_signaling.volume > 0)
-        {
-            _light.Rotate(true);
-            _light.Switch(true);
-        }
-        else
-        {
-            _light.Rotate(false);
-            _light.Switch(false);
-        }        
+        bool isWork = _signaling.volume > 0;
+
+        _light.Rotate(isWork);
+        _light.Switch(isWork);
     }
 }
