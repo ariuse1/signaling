@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using static UnityEngine.Rendering.DebugUI;
 
 public class Signaling : MonoBehaviour
 {
@@ -17,15 +14,12 @@ public class Signaling : MonoBehaviour
     {
         _signaling.volume = 0;
         _signaling.enabled = false;
-
     }
 
     private void Update()
     {
         PlaySignaling();
         PlayLight();
-
-        Debug.Log(_signaling.enabled);
     }
 
     private void OnEnable()
@@ -67,23 +61,27 @@ public class Signaling : MonoBehaviour
         {
             _signaling.enabled = true;
             _signaling.Play();
+            StartCoroutine(ChangeVolume());
         }
-
-        ChangeVolume();
     }
 
-    private void ChangeVolume()
+    private IEnumerator ChangeVolume()
     {
         float maxVolume = 1;
         float correctionValue = 0.1f;
         float soundCorrection = correctionValue * Time.deltaTime; ;
 
-        if (_isWork && _signaling.volume < maxVolume)
-            _signaling.volume += soundCorrection;
-        else if (_isWork == false && _signaling.volume > 0)
-            _signaling.volume -= soundCorrection;
-        else
-            _signaling.enabled = false;
+        while (_signaling.enabled)
+        {
+            if (_isWork && _signaling.volume < maxVolume)
+                _signaling.volume += soundCorrection;
+            else if (_isWork == false && _signaling.volume > 0)
+                _signaling.volume -= soundCorrection;
+            else if(_signaling.volume <= 0)
+                _signaling.enabled = false;
+
+            yield return null;
+        }        
     }
 
     private void PlayLight()
